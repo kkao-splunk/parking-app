@@ -1,0 +1,131 @@
+<form script="search.js">
+  <fieldset submitButton="false">
+    <input type="text" token="address">
+      <label>Address</label>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <title>Parking Meters</title>
+      <map>
+        <search>
+          <query>| inputlookup  meters.csv
+| eval source=coalesce(source, "meters")
+| eval loc=coalesce(Location,LOCATION)
+| rex field=loc "\((?&lt;lat&gt;[^,]+), (?&lt;lon&gt;[^\)]+)\)"
+| geostats count globallimit=0 binspanlat=1 binspanlong=1</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">all</option>
+        <option name="mapping.data.maxClusters">500</option>
+        <option name="mapping.map.center">(37.77,-122.44)</option>
+        <option name="mapping.map.zoom">12</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">19</option>
+        <option name="mapping.tileLayer.url">http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</option>
+        <option name="mapping.type">marker</option>
+        <drilldown>
+          <set token="clicktok">$click.lat.value$</set>
+          <set token="hm">$click.name$</set>
+        </drilldown>
+      </map>
+    </panel>
+    <panel>
+      <title>Crimes</title>
+      <map>
+        <search>
+          <query>| inputlookup  crime.csv
+| eval source=coalesce(source, "crime")
+
+| eval loc=coalesce(Location,LOCATION)
+| rex field=loc "\((?&lt;lat&gt;[^,]+), (?&lt;lon&gt;[^\)]+)\)"
+| geostats count globallimit=0 binspanlat=1 binspanlong=1</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <sampleRatio>1</sampleRatio>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="mapping.choroplethLayer.colorBins">5</option>
+        <option name="mapping.choroplethLayer.colorMode">auto</option>
+        <option name="mapping.choroplethLayer.maximumColor">0xCCFCCF</option>
+        <option name="mapping.choroplethLayer.minimumColor">0xCCFCCF</option>
+        <option name="mapping.choroplethLayer.neutralPoint">0</option>
+        <option name="mapping.choroplethLayer.shapeOpacity">0.75</option>
+        <option name="mapping.choroplethLayer.showBorder">1</option>
+        <option name="mapping.data.maxClusters">400</option>
+        <option name="mapping.legend.placement">bottomright</option>
+        <option name="mapping.map.center">(37.77,-122.44)</option>
+        <option name="mapping.map.panning">1</option>
+        <option name="mapping.map.scrollZoom">0</option>
+        <option name="mapping.map.zoom">12</option>
+        <option name="mapping.markerLayer.markerMaxSize">50</option>
+        <option name="mapping.markerLayer.markerMinSize">10</option>
+        <option name="mapping.markerLayer.markerOpacity">0.8</option>
+        <option name="mapping.showTiles">1</option>
+        <option name="mapping.tileLayer.maxZoom">19</option>
+        <option name="mapping.tileLayer.minZoom">0</option>
+        <option name="mapping.tileLayer.tileOpacity">1</option>
+        <option name="mapping.tileLayer.url">http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</option>
+        <option name="mapping.type">marker</option>
+        <option name="trellis.enabled">0</option>
+        <option name="trellis.scales.shared">1</option>
+        <option name="trellis.size">medium</option>
+      </map>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Safety Rating</title>
+      <viz type="status_indicator_app.status_indicator">
+        <title>Gives a rating on the safeness of the nearby area based off of amount of crimes in 2017. Please use your own discretion at all times.</title>
+        <search>
+          <query>|inputlookup  crime.csv
+|where X&lt;$lat$ AND Y &gt; $lon$
+|stats count BY Location
+| eval color_tok = if(count&gt;2,"#a2cc3e", "#d6563c")
+| eval color_toks = if(count&gt;2,"#a2cc3e", "#d6563c")
+| table count color_tok</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="status_indicator_app.status_indicator.colorBy">field_value</option>
+        <option name="status_indicator_app.status_indicator.fillTarget">text</option>
+        <option name="status_indicator_app.status_indicator.fixIcon">warning</option>
+        <option name="status_indicator_app.status_indicator.icon">fix_icon</option>
+        <option name="status_indicator_app.status_indicator.precision">0</option>
+        <option name="status_indicator_app.status_indicator.showOption">3</option>
+        <option name="status_indicator_app.status_indicator.staticColor">#555</option>
+        <option name="status_indicator_app.status_indicator.useColors">true</option>
+        <option name="status_indicator_app.status_indicator.useThousandSeparator">true</option>
+      </viz>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Nearby parking spots</title>
+      <table>
+        <title>Gives nearby parking meters given a lon/lat pair</title>
+        <search>
+          <query>| inputlookup  meters.csv
+| eval source=coalesce(source, "meters")
+| eval loc=coalesce(Location,LOCATION)
+| rex field=loc "\((?&lt;lat&gt;[^,]+), (?&lt;lon&gt;[^\)]+)\)"
+|where lat &lt; $lat$ + .5 AND $lat$ - .5 &lt; lat AND -122.44 - .5 &lt; $lon$ AND $lon$ &lt; -122.44 + .5
+|table STREET_NUM STREETNAME</query>
+          <earliest>0</earliest>
+          <latest></latest>
+        </search>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">row</option>
+        <option name="percentagesRow">false</option>
+        <option name="rowNumbers">true</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>

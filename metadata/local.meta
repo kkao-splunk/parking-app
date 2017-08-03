@@ -1,0 +1,53 @@
+[app/ui]
+version = 6.6.1
+modtime = 1500246072.665233000
+
+[app/launcher]
+version = 6.6.1
+modtime = 1500246072.670249000
+
+[lookups/meters.csv]
+access = read : [ * ], write : [ admin, power ]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1500939961.756248000
+
+[lookups/meter]
+export = system
+owner = admin
+version = 6.6.1
+modtime = 1500939954.322456000
+
+[props/meters]
+owner = admin
+version = 6.6.1
+modtime = 1501027004.367869000
+
+[views/test]
+access = read : [ * ], write : [ * ]
+export = none
+owner = admin
+version = 6.6.1
+modtime = 1501557618.999079000
+
+[views/maps]
+access = read : [ * ], write : [ * ]
+export = none
+owner = admin
+version = 6.6.1
+modtime = 1501554241.836972000
+
+[views/MainPage]
+access = read : [ * ], write : [ * ]
+export = none
+owner = nobody
+version = 6.6.1
+modtime = 1501781083.834908000
+
+[html/colelctions_html]
+access = read : [ * ], write : [ * ]
+export = none
+owner = admin
+version = 6.6.1
+modtime = 1501779419.055175000
