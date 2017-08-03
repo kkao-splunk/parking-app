@@ -1,5 +1,5 @@
 <form script="search.js">
-  <fieldset submitButton="false">
+  <fieldset submitButton="false" autoRun="false">
     <input type="text" token="address">
       <label>Address</label>
     </input>
@@ -78,54 +78,11 @@
   </row>
   <row>
     <panel>
-      <title>Safety Rating</title>
-      <viz type="status_indicator_app.status_indicator">
-        <title>Gives a rating on the safeness of the nearby area based off of amount of crimes in 2017. Please use your own discretion at all times.</title>
-        <search>
-          <query>|inputlookup  crime.csv
-|where X&lt;$lat$ AND Y &gt; $lon$
-|stats count BY Location
-| eval color_tok = if(count&gt;2,"#a2cc3e", "#d6563c")
-| eval color_toks = if(count&gt;2,"#a2cc3e", "#d6563c")
-| table count color_tok</query>
-          <earliest>0</earliest>
-          <latest></latest>
-        </search>
-        <option name="drilldown">none</option>
-        <option name="status_indicator_app.status_indicator.colorBy">field_value</option>
-        <option name="status_indicator_app.status_indicator.fillTarget">text</option>
-        <option name="status_indicator_app.status_indicator.fixIcon">warning</option>
-        <option name="status_indicator_app.status_indicator.icon">fix_icon</option>
-        <option name="status_indicator_app.status_indicator.precision">0</option>
-        <option name="status_indicator_app.status_indicator.showOption">3</option>
-        <option name="status_indicator_app.status_indicator.staticColor">#555</option>
-        <option name="status_indicator_app.status_indicator.useColors">true</option>
-        <option name="status_indicator_app.status_indicator.useThousandSeparator">true</option>
-      </viz>
-    </panel>
-  </row>
-  <row>
-    <panel>
-      <title>Nearby parking spots</title>
-      <table>
-        <title>Gives nearby parking meters given a lon/lat pair</title>
-        <search>
-          <query>| inputlookup  meters.csv
-| eval source=coalesce(source, "meters")
-| eval loc=coalesce(Location,LOCATION)
-| rex field=loc "\((?&lt;lat&gt;[^,]+), (?&lt;lon&gt;[^\)]+)\)"
-|where lat &lt; $lat$ + .5 AND $lat$ - .5 &lt; lat AND -122.44 - .5 &lt; $lon$ AND $lon$ &lt; -122.44 + .5
-|table STREET_NUM STREETNAME</query>
-          <earliest>0</earliest>
-          <latest></latest>
-        </search>
-        <option name="dataOverlayMode">none</option>
-        <option name="drilldown">row</option>
-        <option name="percentagesRow">false</option>
-        <option name="rowNumbers">true</option>
-        <option name="totalsRow">false</option>
-        <option name="wrap">true</option>
-      </table>
+      <title>Parking meters within a 1-mile radius of the input street</title>
+      <html>
+      <div id="dash1"/>
+      <div id="dash2"/>
+    </html>
     </panel>
   </row>
 </form>
