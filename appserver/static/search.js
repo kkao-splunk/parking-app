@@ -39,9 +39,9 @@ require ([
               var lat = answer.results[0].geometry.location.lat;
               var lon = answer.results[0].geometry.location.lng;
 
-              var query1 = '|inputlookup  crime.csv| where Y<'+(lat+.1)+'AND X<'+(lon+.1)+'|stats count BY Location| eval color_tok = if(count<=2,"#a2cc3e", "#d6563c")| table count color_tok'
+              var query1 = '|inputlookup  crime.csv| where Y<'+(lat+.001)+' AND X<'+(lon+.001)+' AND Y>'+(lat-.001)+' AND X>'+(lon-.001)+'|stats count BY Location| eval color_tok = if(count<=2,"#a2cc3e", "#d6563c")| table count color_tok'
 							console.log(query1);
-              var query2 = '| inputlookup  meters.csv| eval source=coalesce(source, "meters")| eval loc=coalesce(Location,LOCATION)| rex field=loc "\\((?<lat>[^,]+), (?<lon>[^\\)]+)\\)"|where lon <'+(lon + .014).toString()+'AND lon >'+(lon-.014)+'AND lat<'+(lat+.014).toString()+'AND lat>'+(lat-.014).toString()+'|table STREET_NUM STREETNAME'
+              var query2 = '| inputlookup  meters.csv| eval source=coalesce(source, "meters")| eval loc=coalesce(Location,LOCATION)| rex field=loc "\\((?<lat>[^,]+), (?<lon>[^\\)]+)\\)"|where lon <'+(lon + .001).toString()+'AND lon >'+(lon-.001)+'AND lat<'+(lat+.001).toString()+'AND lat>'+(lat-.001).toString()+'|table STREET_NUM STREETNAME'
               tokens.set("searchQuery1",query1);
               tokens.set('searchQuery2',query2)
               var searchindex1 = new SearchManager({
@@ -88,8 +88,8 @@ require ([
     		token.on('change:address', function() {
     			var service = mvc.createService({ owner: 'nobody' });
     			service.del('storage/collections/data/mycollection/').done(function() {
-					$('#dash1').empty();
-					$('#dash2').empty();
+						$('#dash1').empty();
+						$('#dash2').empty();
 						mvc.Components.revokeInstance('searchindex1');
 						mvc.Components.revokeInstance('searchindex2');
 						mvc.Components.revokeInstance('example_table');
